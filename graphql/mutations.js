@@ -2,6 +2,7 @@ const { GraphQLString, GraphQLID } = require("graphql");
 const User = require("../schemas/usuario");
 const generateToken = require("../utils/jwt");
 const Post = require("../schemas/post");
+const Comment = require("../schemas/comment");
 
 const register = {
     type: GraphQLString,
@@ -75,8 +76,23 @@ const deletePost = {
         if(!verifiedUser) throw new Error('unauthorized')
 
         await Post.findByIdAndDelete({_id: args.id})
-        return 'post succesfully deleteed'
+        return 'post succesfully deleted'
     }
 }
 
-module.exports = {register, login, createPost, updatePost, deletePost}
+const addComment = {
+    type: GraphQLString,
+    args: {
+        id:{type: GraphQLID},
+        comment:{type: GraphQLString},
+    },
+    description:'adds a comment',
+    resolve: async(_, args, {verifiedUser})=> {
+        if(!verifiedUser) throw new Error('unauthorized')
+
+        await Comment.create({userId: verifiedUser._id, comment: args.comment, postId: args.id})
+        return 'comment added'
+    }
+}
+
+module.exports = {register, login, createPost, updatePost, deletePost, addComment}

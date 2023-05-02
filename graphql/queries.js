@@ -1,7 +1,8 @@
 const { GraphQLList, GraphQLID } = require("graphql");
 const User = require("../schemas/usuario");
 const Post = require("../schemas/post");
-const { UserType, PostType } = require("./typeDefs");
+const { UserType, PostType, CommentType } = require("./typeDefs");
+const Comment = require("../schemas/comment");
 
 const usuarios = {
     type: new GraphQLList(UserType),
@@ -28,8 +29,7 @@ const posts = {
     type: new GraphQLList(PostType),
     description:'return all posts',
     resolve: async()=> {
-        const posts = await Post.find()
-        return posts
+        return await Post.find()
     }
 }
 
@@ -40,9 +40,16 @@ const post = {
         id: {type: GraphQLID}
     },
     resolve: async(_, args)=> {
-        const post = await Post.findById({_id: args.id})
-        return post
+        return await Post.findById({_id: args.id})
     }
 }
 
-module.exports = { usuarios, usuario, posts, post }
+const getComments = {
+    type: CommentType,
+    description:'return all comments from one post',
+    resolve: async()=> {
+        return await Comment.find()
+    }
+}
+
+module.exports = { usuarios, usuario, posts, post, getComments }
